@@ -2,29 +2,35 @@ const mongoose = require("mongoose");
 
 const collectionPointSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      }, // [longitude, latitude]
-    },
     capacity: {
       type: Number,
       required: true,
-    }, // Total capacity
-    wasteTypes: {
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    time: {
+      type: Date,
+      required: true,
+    },
+    category: {
       type: [String],
       enum: ["organic", "recyclable", "hazardous"],
       required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    user_name: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Completed"],
+      default: "Pending",
     },
   },
   { timestamps: true }
