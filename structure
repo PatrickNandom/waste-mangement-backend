@@ -1,0 +1,196 @@
+
+waste-management-backend/
+│
+├── src/                         
+│   ├── config/                 # Configuration files (database connection, environment variables)
+│   │   └── db.js               # MongoDB connection setup
+│   │   └── dotenv.js           # Load environment variables
+│   │
+│   ├── controllers/            # Business logic for different entities
+│   │   └── authController.js    # User authentication
+│   │   └── userController.js    # User-related actions
+│   │   └── collectionController.js # Waste collection points and scheduling
+│   │   └── vehicleController.js    # Vehicle tracking and management
+│   │
+│   ├── models/                 # Mongoose models for MongoDB collections
+│   │   └── userModel.js        # User model schema
+│   │   └── collectionPointModel.js # Collection points schema
+│   │   └── vehicleModel.js     # Vehicle schema
+│   │
+│   ├── routes/                 # Routes to map HTTP requests to controllers
+│   │   └── authRoutes.js       # Authentication-related routes (login, register)
+│   │   └── userRoutes.js       # Routes related to user actions
+│   │   └── collectionRoutes.js # Routes for collection point management
+│   │   └── vehicleRoutes.js    # Routes for vehicle tracking
+│   │
+│   ├── middlewares/            # Custom middleware (auth, error handling)
+│   │   └── authMiddleware.js   # Middleware for protected routes (JWT authentication)
+│   │
+│   ├── services/               # Business logic and helper services
+│   │   └── notificationService.js # Logic for notification system (email/SMS)
+│   │   └── reportService.js       # Generate reports on waste collection
+│   │
+│   ├── utils/                  # Utility functions/helpers (e.g., validation, error handling)
+│   │   └── errorHandler.js     # Custom error handling
+│   │
+│   └── app.js                  # Express app setup and middleware
+│   └── server.js               # Entry point for starting the server
+│
+├── .env                        # Environment variables (DB connection, JWT secrets, API keys)
+├── .gitignore                  # Ignore node_modules, logs, etc.
+├── package.json                # Project metadata and dependencies
+├── README.md                   # Documentation for the project
+└── nodemon.json                # Config for auto-restart during development
+
+#The Functioal Requirement of this project
+Functional Requirement Breakdown:
+3.1 User Registration and Authentication
+FR1.1: Users must be able to register with personal details (name, address, phone number, email).
+File(s): authController.js (handles user registration).
+Models: User.js (defining user schema, which includes fields like name, address, phone number, email).
+Routes: authRoutes.js (POST route for user registration).
+FR1.2: The system should support authentication via username/password and provide options for password recovery.
+File(s): authController.js (handles login and password recovery).
+Models: User.js (storing username/password securely, perhaps using bcrypt for hashing).
+Routes: authRoutes.js (POST route for login and password recovery).
+Note: Since authentication is a core requirement, make sure to implement user sessions (via JWT or session tokens) in authController.js and secure routes that require authentication.
+
+3.2 Waste Collection Point Management
+FR2.1: Admin users must be able to define and update waste collection points (location, capacity, type of waste).
+
+File(s): collectionPointController.js (admin can add/update collection points).
+Models: CollectionPoint.js (a model to define collection point attributes like location, capacity, waste type).
+Routes: collectionPointRoutes.js (POST and PUT routes for adding/updating collection points).
+FR2.2: The system should categorize waste types (organic, recyclable, hazardous).
+
+File(s): collectionPointController.js (logic for managing categories).
+Models: CollectionPoint.js (waste types field in schema).
+Routes: collectionPointRoutes.js.
+3.3 Waste Collection Scheduling
+FR3.1: The system should provide a scheduling module for waste collection bookings.
+
+File(s): scheduleController.js (handles scheduling logic for user bookings).
+Models: Schedule.js (model for storing scheduling data, including user booking info).
+Routes: scheduleRoutes.js (routes for users to book collection times).
+FR3.2: Admin users must create and update schedules based on location and vehicle availability.
+
+File(s): scheduleController.js (admin can manage scheduling).
+Models: Schedule.js, possibly extending Vehicle.js for availability.
+Routes: scheduleRoutes.js.
+3.4 Vehicle Tracking and Management
+FR4.1: Track waste collection vehicles in real-time using GPS data.
+
+File(s): vehicleController.js (logic for vehicle tracking).
+Models: Vehicle.js (store vehicle information including GPS data).
+Routes: vehicleRoutes.js (for updating and retrieving vehicle data).
+FR4.2: Route optimization for collection vehicles based on collection point locations and traffic data.
+
+File(s): routeOptimizationController.js (optional file for route optimization logic).
+Models: Route.js (for storing optimized routes).
+Routes: routeRoutes.js (for accessing optimized routes).
+Note: This would require integrating a third-party API like Google Maps or a similar service for GPS tracking and route optimization.
+
+3.5 Reporting and Analytics
+FR5.1: Generate reports on waste collection efficiency, waste volume, vehicle performance.
+
+File(s): reportingController.js (logic for generating reports).
+Models: This might query across CollectionPoint.js, Vehicle.js, and Schedule.js.
+Routes: reportingRoutes.js (to expose the reports).
+FR5.2: Provide analytics dashboards for monitoring environmental impact and waste management optimization.
+
+File(s): analyticsController.js (handles analytics logic).
+Models: May require aggregating data from various sources like CollectionPoint.js, Vehicle.js, and Schedule.js.
+Routes: analyticsRoutes.js (for accessing dashboards).
+Note: Dashboards could be implemented on the frontend, with the backend serving API endpoints.
+
+3.6 Notification System
+FR6.1: Notify users about upcoming collection times, changes in schedules, etc.
+
+File(s): notificationController.js (logic for sending notifications).
+Models: Notification.js (model for storing user notification preferences, notification logs).
+Routes: notificationRoutes.js (to manage notifications).
+FR6.2: Admin users should manage notification settings.
+
+File(s): notificationController.js (admin can configure notifications).
+Models: Notification.js (to store admin configurations).
+Routes: notificationRoutes.js (routes for admins).
+
+
+//  WASTE MANAGEMENT SYSTEM ROUTES
+
+const express = require("express");
+const router = express.Router();
+const {
+  registerController,
+  loginUserController,
+} = require("../controllers/authController");
+
+const {
+  addVehicle,
+  updateVehicleLocation,
+  getAllVehicles,
+  getVehicleById,
+} = require("../controllers/vehicleController");
+
+const {
+  defineCollectionPoint,
+  updateCollectionPoint,
+  getAllCollectionPoints,
+  getCollectionPointById,
+} = require("../controllers/collectionPointController");
+
+const {
+  scheduleCollection,
+  updateCollectionSchedule,
+  getAllSchedules,
+} = require("../controllers/scheduleController");
+
+const {
+  generateReports,
+  viewAnalyticsDashboard,
+} = require("../controllers/reportController");
+
+const authMiddleware = require("../middlewares/authMiddleware");
+const adminMiddleware = require("../middlewares/adminMiddleware");
+
+// ----------------------
+// AUTH ROUTES (Public)
+// ----------------------
+// Register for all users
+router.post("/register", registerController);
+router.post("/login", loginUserController);
+
+// ----------------------
+// RESIDENT ROUTES
+// ----------------------
+// Residents can book waste collection and view collection points
+router.post("/residents/book-collection", authMiddleware, scheduleCollection); // Schedule a collection
+router.get("/residents/collection-points", authMiddleware, getAllCollectionPoints); // View all collection points
+router.get("/residents/collection-schedule", authMiddleware, getAllSchedules); // View collection schedules
+
+// ----------------------
+// ADMIN ROUTES (Protected)
+// ----------------------
+// Admin can manage collection points, vehicles, and reports
+router.post("/admin/collection-point", authMiddleware, adminMiddleware, defineCollectionPoint); // Add collection point
+router.put("/admin/collection-point/:id", authMiddleware, adminMiddleware, updateCollectionPoint); // Update collection point
+router.get("/admin/vehicles", authMiddleware, adminMiddleware, getAllVehicles); // View all vehicles
+router.get("/admin/reports", authMiddleware, adminMiddleware, generateReports); // View reports
+router.get("/admin/analytics", authMiddleware, adminMiddleware, viewAnalyticsDashboard); // View analytics dashboard
+
+// ----------------------
+// DRIVER ROUTES (Protected)
+// ----------------------
+// Drivers can update their location and status
+router.put("/driver/update-location/:id", authMiddleware, updateVehicleLocation); // Update vehicle location
+router.get("/driver/vehicle/:id", authMiddleware, getVehicleById); // View vehicle details
+
+// ----------------------
+// SYSTEM ROUTES (Common)
+// ----------------------
+// Common routes for all authenticated users
+router.get("/collection-points", authMiddleware, getAllCollectionPoints); // Get collection points
+router.get("/collection-point/:id", authMiddleware, getCollectionPointById); // Get collection point by ID
+
+module.exports = router;
+
