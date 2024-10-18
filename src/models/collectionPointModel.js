@@ -15,7 +15,7 @@ const collectionPointSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: [String],
+      type: String,
       enum: ["organic", "recyclable", "hazardous"],
       required: true,
     },

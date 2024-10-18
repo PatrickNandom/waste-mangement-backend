@@ -194,3 +194,59 @@ router.get("/collection-point/:id", authMiddleware, getCollectionPointById); // 
 
 module.exports = router;
 
+
+const express = require('express');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const User = require('../models/User'); // Assuming you're using Mongoose or a similar ORM
+const bcrypt = require('bcryptjs');
+
+const router = express.Router();
+
+// Step 1: Password Reset Request
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Step 2: Generate reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    // Step 3: Save token and expiration time to the user document
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour expiration
+    await user.save();
+
+    // Step 4: Send email with reset link
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,  // Gmail account email
+        pass: process.env.EMAIL_PASS   // Gmail account password
+      }
+    });
+
+    const resetUrl = `http://${req.headers.host}/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      to: user.email,
+      from: 'passwordreset@example.com',
+      subject: 'Password Reset Request',
+      text: `You are receiving this email because you requested a password reset. Please click on the link to reset your password: ${resetUrl}`
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: 'Email sent with password reset instructions.' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+

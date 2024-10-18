@@ -12,13 +12,6 @@ exports.requestPickUp = async (req, res) => {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    const validWasteTypes = ["organic", "recyclable", "hazardous"];
-    for (let type of category) {
-      if (!validWasteTypes.includes(type.toLowerCase())) {
-        return res.status(400).json({ error: `Invalid waste type: ${type}` });
-      }
-    }
-
     // Fetch the user by userId
     let user = await User.findById(userId);
 
