@@ -2,12 +2,14 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const router = require("./routes/index");
+const cors = require("cors");
 
 // LOAD ENVIRONMENT VARIABLES
 dotenv.config();
 
 // INITIALIZE EXPRESS
 const app = express();
+app.use(cors());
 
 // MIDDLEWARE
 app.use(express.json());
