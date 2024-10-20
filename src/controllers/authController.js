@@ -7,6 +7,11 @@ exports.registerController = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
 
+    const nameParts = name.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ");
+    let username = `${firstName}.${lastName}`.toLowerCase();
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
@@ -21,6 +26,7 @@ exports.registerController = async (req, res) => {
       email,
       phone,
       password: hashedPassword,
+      username,
     });
     user = await user.save();
     res.json(user);
