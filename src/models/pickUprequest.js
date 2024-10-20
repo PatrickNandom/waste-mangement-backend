@@ -1,4 +1,9 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
+
+const generateUniqueSearchId = () => {
+  return uuidv4().slice(0, 4);
+};
 
 const pickUpRequestSchema = new mongoose.Schema(
   {
@@ -36,6 +41,11 @@ const pickUpRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    searchId: {
+      type: String,
+      unique: true,
+      default: generateUniqueSearchId,
     },
   },
   { timestamps: true }
