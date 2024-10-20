@@ -197,3 +197,27 @@ exports.updateUserPassword = async (req, res) => {
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
+
+//SEARCH FOR PICK UP CONTROLLER
+exports.searchPickUp = async (req, res) => {
+  try {
+    const { searchId } = req.body;
+
+    const pickUpRequest = await PickUpRequest.findOne({ searchId });
+
+    if (!pickUpRequest) {
+      return res.status(404).json({
+        message: "Pick-up request not found",
+      });
+    }
+
+    return res.status(200).json({
+      data: pickUpRequest,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while searching for the pick-up request",
+      error: error.message,
+    });
+  }
+};

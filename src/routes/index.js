@@ -30,6 +30,7 @@ const {
   completedPickups,
   pendingPickups,
   allUserPickups,
+  searchPickUp,
 } = require("../controllers/userController");
 
 //AUTH ROUTES(PUBLIC ROUTES).
@@ -67,9 +68,12 @@ router.get(
 
 //USER ROUTES PROTECTED
 router.post("/user/request-pickup/:userId", authMiddleware, requestPickUp);
+router.post("/user/search-pickup", authMiddleware, searchPickUp);
+
 router.put("/users/:userId", authMiddleware, updateUserProfile);
 router.put("/users/:userId/password", authMiddleware, updateUserPassword);
 router.get("/user/completed-pickup/:userId", authMiddleware, completedPickups);
 router.get("/user/pending-pickup/:userId", authMiddleware, pendingPickups);
 router.get("/user/all-user-pickups/:userId", authMiddleware, allUserPickups);
+
 module.exports = router;
