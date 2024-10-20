@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const collectionPointSchema = new mongoose.Schema(
+const pickUpRequestSchema = new mongoose.Schema(
   {
     capacity: {
       type: Number,
@@ -27,7 +27,11 @@ const collectionPointSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    status: {
+      type: String,
+      enum: ["Pending", "Completed"],
+      default: "Pending",
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -37,8 +41,5 @@ const collectionPointSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const CollectionPoint = mongoose.model(
-  "CollectionPoint",
-  collectionPointSchema
-);
-module.exports = CollectionPoint;
+const PickUpRequest = mongoose.model("PickUpRequest", pickUpRequestSchema);
+module.exports = PickUpRequest;

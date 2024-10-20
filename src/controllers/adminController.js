@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const CollectionPoint = require("../models/collectionPointModel");
+const PickUpRequest = require("../models/pickUprequest");
 const bcryptjs = require("bcryptjs");
 
 //CREATE A NEW STAFF CONTROLLER
@@ -47,8 +47,8 @@ exports.createNewStaff = async (req, res) => {
   }
 };
 
-// UPDATE A COLLECTION POINT CONTROLLER
-exports.updateCollectionPoint = async (req, res) => {
+// UPDATE A PICK UP REQUEST CONTROLLER
+exports.updatePickUpRequest = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
@@ -58,22 +58,22 @@ exports.updateCollectionPoint = async (req, res) => {
       return res.status(400).json({ message: "Invalid status value" });
     }
 
-    // Find the collection point by ID and update the status
-    const updatedCollectionPoint = await CollectionPoint.findByIdAndUpdate(
+    const updatedPickUpRequest = await PickUpRequest.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     );
 
-    // If no collection point found with the given ID
-    if (!updatedCollectionPoint) {
-      return res.status(404).json({ message: "Collection point not found" });
+    if (!updatedPickUpRequest) {
+      return res
+        .status(404)
+        .json({ message: "pick up request point not found" });
     }
 
     // Return the updated collection point
-    res.status(200).json(updatedCollectionPoint);
+    res.status(200).json(updatedPickUpRequest);
   } catch (error) {
-    console.error("Error updating collection point:", error);
+    console.error("Error updating pick up request point:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -119,15 +119,15 @@ exports.getAllStaff = async (req, res) => {
 // FETCH ALL PICKUPS
 exports.getAllPickUp = async (req, res) => {
   try {
-    const collectionPoints = await CollectionPoint.find();
+    const pickUpRequests = await PickUpRequest.find();
 
-    if (collectionPoints.length === 0) {
-      return res.status(404).json({ message: "No collection points found." });
+    if (pickUpRequests.length === 0) {
+      return res.status(404).json({ message: "No pick up request found." });
     }
 
     res.status(200).json({
-      message: "Collection points retrieved successfully.",
-      collectionPoints,
+      message: "Pick up request retrieved successfully.",
+      pickUpRequests,
     });
   } catch (error) {
     console.error(error);
@@ -138,7 +138,7 @@ exports.getAllPickUp = async (req, res) => {
 //FETCHING COMPLETED PICKUP
 exports.getCompletedPickUp = async (req, res) => {
   try {
-    const completedPickups = await CollectionPoint.find({
+    const completedPickups = await PickUpRequest.find({
       status: "Completed",
     });
 
@@ -159,7 +159,7 @@ exports.getCompletedPickUp = async (req, res) => {
 //FETCHING PENDING PICKUP
 exports.getPendingPickUp = async (req, res) => {
   try {
-    const pendingPickups = await CollectionPoint.find({
+    const pendingPickups = await PickUpRequest.find({
       status: "Pending",
     });
 

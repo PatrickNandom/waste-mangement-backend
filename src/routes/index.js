@@ -14,7 +14,7 @@ const {
 // IMPORTING ADMIN CONTROLLERS
 const {
   createNewStaff,
-  updateCollectionPoint,
+  updatePickUpRequest,
   getAllUsers,
   getAllStaff,
   getAllPickUp,
@@ -47,7 +47,7 @@ router.put(
   "/admin/update-collection-point/:id",
   authMiddleware,
   adminMiddleware,
-  updateCollectionPoint
+  updatePickUpRequest
 );
 router.get("/admin/all-users", authMiddleware, adminMiddleware, getAllUsers);
 router.get("/admin/all-staff", authMiddleware, adminMiddleware, getAllStaff);

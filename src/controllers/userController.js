@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const CollectionPoint = require("../models/collectionPointModel");
+const PickUpRequest = require("../models/pickUprequest");
 const bcryptjs = require("bcryptjs");
 
 //MAKING REQUEST FOR PICKUPS
@@ -20,8 +20,8 @@ exports.requestPickUp = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Create a new collection point entry
-    let collectionPoint = new CollectionPoint({
+    // Create a new pickup request entry
+    let pickup = new PickUpRequest({
       capacity,
       location,
       time,
@@ -31,11 +31,11 @@ exports.requestPickUp = async (req, res) => {
       userId: user._id,
     });
 
-    await collectionPoint.save();
+    await pickup.save();
 
     res.status(201).json({
-      message: "Collection point created successfully",
-      collectionPoint,
+      message: "Pick up created successfully",
+      pickup,
     });
   } catch (error) {
     console.error(error);
@@ -48,7 +48,7 @@ exports.completedPickups = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const completedPickups = await CollectionPoint.find({
+    const completedPickups = await PickUpRequest.find({
       userId,
       status: "Completed",
     });
@@ -71,7 +71,7 @@ exports.pendingPickups = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const pendingPickups = await CollectionPoint.find({
+    const pendingPickups = await PickUpRequest.find({
       userId,
       status: "Pending",
     });
@@ -94,7 +94,7 @@ exports.allUserPickups = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const allPickups = await CollectionPoint.find({ userId });
+    const allPickups = await PickUpRequest.find({ userId });
 
     if (allPickups.length === 0) {
       return res.status(404).json({ message: "No pickups found." });
