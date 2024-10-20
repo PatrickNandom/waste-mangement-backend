@@ -28,6 +28,7 @@ exports.requestPickUp = async (req, res) => {
       category,
       user_name: user.name,
       phone: user.phone,
+      userId: user._id,
     });
 
     await collectionPoint.save();
@@ -42,18 +43,66 @@ exports.requestPickUp = async (req, res) => {
   }
 };
 
-//GETTING ALL THE PICKUP REQUEST
-exports.getAllPickUp = async (req, res) => {
+//GETTING ALL COMPLETED PICKUP
+exports.completedPickups = async (req, res) => {
   try {
-    const collectionPoints = await CollectionPoint.find();
+    const { userId } = req.params;
 
-    if (collectionPoints.length === 0) {
-      return res.status(404).json({ message: "No collection points found." });
+    const completedPickups = await CollectionPoint.find({
+      userId,
+      status: "Completed",
+    });
+
+    if (completedPickups.length === 0) {
+      return res.status(404).json({ message: "No completed pickups found." });
     }
 
     res.status(200).json({
-      message: "Collection points retrieved successfully.",
-      collectionPoints,
+      message: "Completed pickups retrieved successfully.",
+      completedPickups,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error. Please try again later." });
+  }
+};
+//GETTING ALL PENDING PICK UP
+exports.pendingPickups = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const pendingPickups = await CollectionPoint.find({
+      userId,
+      status: "Pending",
+    });
+
+    if (pendingPickups.length === 0) {
+      return res.status(404).json({ message: "No pending pickups found." });
+    }
+
+    res.status(200).json({
+      message: "Pending pickups retrieved successfully.",
+      pendingPickups,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error. Please try again later." });
+  }
+};
+//GETTING ALL THE PICKUP ASSOCIATED WITH A USER(PENDING AND COMPLETED)
+exports.allUserPickups = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const allPickups = await CollectionPoint.find({ userId });
+
+    if (allPickups.length === 0) {
+      return res.status(404).json({ message: "No pickups found." });
+    }
+
+    res.status(200).json({
+      message: "All pickups retrieved successfully.",
+      allPickups,
     });
   } catch (error) {
     console.error(error);
@@ -67,7 +116,6 @@ exports.updateUserProfile = async (req, res) => {
     const { userId } = req.params;
     const { name, email, phone } = req.body;
 
-    // Find the user by ID
     let user = await User.findById(userId);
 
     // Check if the user exists
