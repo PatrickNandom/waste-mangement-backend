@@ -44,7 +44,7 @@ router.post(
   createNewStaff
 );
 router.put(
-  "/admin/update-collection-point/:id",
+  "/admin/update-pickup-request/:id",
   authMiddleware,
   adminMiddleware,
   updatePickUpRequest
