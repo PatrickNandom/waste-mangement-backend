@@ -10,7 +10,7 @@ exports.registerController = async (req, res) => {
     const nameParts = name.trim().split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ");
-    let username = `${firstName}.${lastName}`.toLowerCase();
+    let username = `${firstName}_${lastName}`.toLowerCase();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
