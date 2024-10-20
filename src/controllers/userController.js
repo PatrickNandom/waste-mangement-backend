@@ -114,7 +114,7 @@ exports.allUserPickups = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { name, email, phone } = req.body;
+    const { name, email, phone, username } = req.body;
 
     let user = await User.findById(userId);
 
@@ -145,6 +145,8 @@ exports.updateUserProfile = async (req, res) => {
       }
       user.phone = phone;
     }
+
+    if (username) user.username = username;
 
     await user.save();
 
