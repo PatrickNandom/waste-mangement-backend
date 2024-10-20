@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
 const generateUniqueSearchId = () => {
-  return uuidv4().slice(0, 4);
+  return uuidv4().slice(0, 4).toUpperCase();
 };
 
 const pickUpRequestSchema = new mongoose.Schema(
