@@ -75,6 +75,7 @@ exports.loginUserController = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        username:user.username
       },
     });
   } catch (e) {
